@@ -1,0 +1,8 @@
+public
+auth
+login
+registration
+try for free
+
+if(public pages more than private)
+	make frontend first

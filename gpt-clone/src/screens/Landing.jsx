@@ -1,13 +1,19 @@
+import Typer from "@/components/Typer";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Landing = () => {
+  const navigate = useNavigate();
   return (
     <div className="maindiv flex  h-screen w-screen">
       <div className="left flex-3/5 bg-[#01002E] h-screen text-purple-400 flex flex-col">
         <div className="p-4 font-bold h-1/2 text-2xl">ChatGPT</div>
         <div className="p-4 h-2/3 text-4xl font-bold">
-          Brainstorm names for an orange cat we're adopting from the shelter
+          <Typer
+            sentence={
+              "Brainstorm names for an orange cat we're adopting from the shelter"
+            }
+          />
         </div>
       </div>
       <div className=" text-3xl right flex-2/5 h-screen bg-black text-center flex flex-col items-center justify-center text-white gap-4 ">

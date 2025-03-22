@@ -34,6 +34,7 @@ const Chat = () => {
     console.log("API response: ", response);
   };
   //bg-[#212121]
+  console.log("sentence: ", response);
   return (
     <div className="bg-gray-950 w-dvw h-screen text-white text-2xl overflow-auto">
       {/* Header */}
@@ -65,20 +66,22 @@ const Chat = () => {
                 e.target.style.height = "auto"; // Reset height to recalculate
                 e.target.style.height = `${e.target.scrollHeight}px`; // Expand dynamically
               }}
-              // onKeyDown={}
+            // onKeyDown={}
             />
             <button
               type="submit"
               className="bg-white text-black rounded-full hover:bg-gray-200 w-16 h-16 flex items-center justify-center"
             >
-              <img src={arrow} alt="hey" className="w-8 h-8" />
+              <img src={arrow} alt="arrow" className="w-8 h-8" />
             </button>
           </div>
         </form>
 
         {/* Display AI Response */}
-        <div className=" max-w-5xl p-4 whitespace-pre-wrap break-words "></div>
-        {response ? <TyperMark sentence={response} /> : null}
+        <div className="text-white max-w-5xl p-4 whitespace-pre-wrap break-words  ">
+          {/* write text so i can check my markdown and tailwind typography */}
+          {response ? <TyperMark sentence={response} /> : null}
+        </div>
       </div>
     </div>
   );

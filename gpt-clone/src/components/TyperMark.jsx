@@ -11,7 +11,6 @@ const TyperMark = ({ sentence }) => {
   const plainText =
     typeof sentence === "string" ? sentence : extractText(sentence);
 
-  console.log("sentence: ", sentence);
   useEffect(() => {
     if (charIndex < plainText.length) {
       const timeout = setTimeout(() => {
@@ -22,16 +21,16 @@ const TyperMark = ({ sentence }) => {
   }, [charIndex, plainText, speed]);
 
   return (
-    <span className="w-5xl  whitespace-pre-wrap break-words">
-      {/* Render Markdown but only show the sliced text */}{" "}
+    <span className="text-white   lg:prose-xl prose break-words whitespace-pre-wrap w-5xl">
+      {/* Render Markdown but only show the sliced text */}
       <ReactMarkdown
         rehypePlugins={[rehypeRaw]} // Enables raw HTML parsing
-        allowedElements={["h1", "h2", "p", "strong", "ul", "li", "span"]}
       >
         {plainText.slice(0, charIndex)}
       </ReactMarkdown>
       {/* Blinking cursor */}
-      <span className="ml-1 w-[5px] h-[1em] bg-black animate-blink"></span>
+      <span className="animate-pulse bg-gray-500 w-1 h-5 inline-block"></span>
+
     </span>
   );
 };

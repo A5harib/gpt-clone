@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 
-const Typer = ({ sentence }) => {
+const Typer = ({ sentence, onComplete }) => {
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const speed = 50;
-  const delay = 1500;
+  const delay = 500;
 
   useEffect(() => {
     const timeout = setTimeout(
       () => {
-        console.log("sentence: ", sentence);
         if (isDeleting) {
           if (charIndex > 0) {
             setCharIndex(charIndex - 1);
           } else {
             setIsDeleting(false);
+            onComplete();
           }
         } else {
           if (charIndex < sentence.length) {

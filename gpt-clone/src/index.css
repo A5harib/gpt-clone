@@ -7,6 +7,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+body {
+  @apply bg-gray-950;
+}
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -120,5 +123,199 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* WebKit-based browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111827; /* bg-gray-950 */
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f2937; /* bg-gray-900 */
+  border-radius: 8px;
+  transition: background 0.3s ease-in-out;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #374151; /* Slightly lighter gray for hover */
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1f2937 #111827; /* thumb | track */
+}
+@layer components {
+  /* Base styling for the Markdown container */
+  .cms-content {
+    @apply max-w-5xl prose prose-invert lg:prose-xl text-white;
+  }
+
+  /* Paragraphs */
+  .cms-content > p {
+    @apply mt-6 leading-relaxed;
+  }
+
+  /* Headings */
+  .cms-content > h1 {
+    @apply text-3xl font-bold mt-8 mb-4;
+  }
+
+  .cms-content > h2 {
+    @apply text-2xl font-semibold mt-6 mb-3;
+  }
+
+  .cms-content > h3 {
+    @apply text-xl font-semibold mt-5 mb-2;
+  }
+
+  /* Lists */
+  .cms-content > ul {
+    @apply list-disc pl-5 mt-4;
+  }
+
+  .cms-content > ol {
+    @apply list-decimal pl-5 mt-4;
+  }
+
+  /* Blockquotes */
+  .cms-content > blockquote {
+    @apply border-l-4 border-gray-700 pl-4 italic text-gray-300 mt-6;
+  }
+
+  /* Horizontal Rule */
+  .cms-content > hr {
+    @apply border-gray-700 my-6;
+  }
+
+  /* Tables */
+  .cms-content > table {
+    @apply w-full border-collapse mt-4;
+  }
+
+  .cms-content > table th {
+    @apply bg-gray-900 text-white px-4 py-2;
+  }
+
+  .cms-content > table td {
+    @apply border border-gray-800 px-4 py-2;
+  }
+
+  /* 🔥 Special Styling for Code Blocks (ChatGPT-Style `.response`) */
+  .response {
+    @apply bg-gray-900 rounded-lg overflow-x-auto mt-6;
+  }
+
+  .response pre {
+    @apply text-white;
+  }
+
+  .response code {
+    @apply text-sm font-mono block;
+  }
+
+  /* Inline Code */
+  .cms-content > p code {
+    @apply bg-gray-800  rounded text-sm text-gray-300;
+  }
+
+  /* Scrollbars for `.response` */
+  .response::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .response::-webkit-scrollbar-track {
+    @apply bg-gray-950 rounded-lg;
+  }
+
+  .response::-webkit-scrollbar-thumb {
+    @apply bg-gray-900 rounded-lg transition-colors duration-300;
+  }
+
+  .response::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-700;
+  }
+
+  /* Firefox Scrollbar */
+  .response {
+    scrollbar-width: thin;
+    scrollbar-color: theme("colors.gray.900") theme("colors.gray.950");
+  }
+
+  /* //hljs */
+  .hljs-keyword {
+    @apply text-purple-400 font-bold;
+  }
+
+  .hljs-string {
+    @apply text-green-400;
+  }
+
+  .hljs-number {
+    @apply text-blue-400;
+  }
+
+  .hljs-comment {
+    @apply text-gray-500 italic;
+  }
+
+  .hljs-title,
+  .hljs-function {
+    @apply text-yellow-400;
+  }
+
+  .hljs-operator {
+    @apply text-pink-400;
+  }
+  .hljs-section {
+    @apply text-blue-400 font-bold text-lg;
+  }
+
+  /* Strong (bold) */
+  .hljs-strong {
+    @apply font-bold text-white;
+  }
+
+  /* Emphasis (italic) */
+  .hljs-emphasis {
+    @apply italic text-gray-300;
+  }
+
+  /* Inline code */
+  .hljs-code {
+    @apply bg-gray-800 text-green-300 px-1 rounded;
+  }
+
+  /* Strings */
+  .hljs-string {
+    @apply text-green-400;
+  }
+
+  /* Links */
+  .hljs-link {
+    @apply text-blue-400 underline;
+  }
+
+  /* Bullet points (list markers) */
+  .hljs-bullet {
+    @apply text-purple-400;
+  }
+
+  /* Blockquotes */
+  .hljs-quote {
+    @apply text-gray-500 italic border-l-4 border-gray-700 pl-4;
+  }
+
+  /* Another section (for clarity if different use case) */
+  .hljs-title {
+    @apply text-yellow-400 font-semibold;
   }
 }

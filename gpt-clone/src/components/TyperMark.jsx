@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 
 const TyperMark = ({ sentence }) => {
   const [charIndex, setCharIndex] = useState(0);
@@ -21,15 +23,15 @@ const TyperMark = ({ sentence }) => {
   }, [charIndex, plainText, speed]);
 
   return (
-    <span className="text-white   lg:prose-xl prose break-words whitespace-pre-wrap w-5xl">
+    <span className="text-white   break-words whitespace-pre-wrap w-5xl">
       {/* Render Markdown but only show the sliced text */}
       <ReactMarkdown
-        rehypePlugins={[rehypeRaw]} // Enables raw HTML parsing
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw, rehypeHighlight]} // Enables raw HTML parsing
       >
         {plainText.slice(0, charIndex)}
       </ReactMarkdown>
       {/* Blinking cursor */}
-      <span className="animate-pulse bg-gray-500 w-1 h-5 inline-block"></span>
 
     </span>
   );

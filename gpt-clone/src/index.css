@@ -218,7 +218,7 @@ body {
   }
 
   .response code {
-    @apply text-sm font-mono block;
+    @apply text-sm bg-black w-fit p-4 rounded-sm border-t-6 border-gray-700  block;
   }
 
   /* Inline Code */

@@ -8,8 +8,6 @@ import { motion } from "framer-motion";
 
 const Chat = () => {
   const [input, setInput] = useState("");
-  const [response, setResponse] = useState("");
-  const [msg, setMsg] = useState(false);
   const [messages, setMessages] = useState([]);
   const chatContainerRef = useRef(null);
   useEffect(() => {
@@ -78,10 +76,7 @@ const Chat = () => {
         >
           <div className="font-bold text-4xl mb-10">What can I help with?</div>
           <EnterPrompt handleSend={handleSend} input={input} setInput={setInput} />
-          {/* <div className="flex flex-col justify-center items-center gap-2 mt-10 mb-96">
-            <div className="font-bold text-4xl mb-10">What can I help with?</div>
-            <EnterPrompt handleSend={handleSend} input={input} setInput={setInput} />
-          </div> */}
+
         </motion.div>
       ) : (
         <motion.div
@@ -106,18 +101,7 @@ const Chat = () => {
       )}
 
 
-      {/* <div className="flex flex-col justify-center items-center gap-2 mt-10 mb-96  ">
-      
-        <div className="font-bold text-4xl mb-10">What can I help with?</div>
-        
-        <EnterPrompt handleSend={handleSend} input={input} setInput={setInput} setMsg={setMsg} />
-        Display AI Response
-        <div>
-          {msg ? <ChatMessage message={input} /> : null}
-          <ChatResponse responseMsg={response} />
-        </div>
 
-      </div> */}
 
 
     </div>

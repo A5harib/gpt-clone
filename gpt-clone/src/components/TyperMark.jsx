@@ -7,7 +7,7 @@ import remarkGfm from "remark-gfm";
 const TyperMark = ({ sentence }) => {
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
-  const speed = 5;
+  const speed = 1;
 
   // Extract text from ReactMarkdown JSX
   const plainText =

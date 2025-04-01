@@ -1,8 +1,9 @@
 import React from 'react';
 import arrow from "../assets/arrow_upward.png";
-const EnterPrompt = ({ handleSend, input, setInput }) => {
+const EnterPrompt = ({ handleSend, input, setInput, setPressEnter }) => {
     const handleKeyDown = (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
+            setPressEnter(true)
             e.preventDefault(); // Prevents new line in textarea
             handleSend(e); // Trigger submit
         }

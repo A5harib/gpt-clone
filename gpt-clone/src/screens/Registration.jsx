@@ -16,7 +16,6 @@ const Registration = () => {
 
     try {
       await createUser(email, password);
-      alert("Account created successfully!");
       navigate("/chat");
     } catch (error) {
       console.error(error);
@@ -48,9 +47,8 @@ const Registration = () => {
 
           <button
             type="submit"
-            className={`w-full bg-green-600 text-white py-3 rounded-lg font-semibold transition mb-4 ${
-              loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-700"
-            }`}
+            className={`w-full bg-green-600 text-white py-3 rounded-lg font-semibold transition mb-4 ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-700"
+              }`}
             disabled={loading}
           >
             {loading ? "Creating account..." : "Sign Up"}

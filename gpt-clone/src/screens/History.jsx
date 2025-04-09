@@ -1,8 +1,58 @@
-import React from 'react';
+import { auth, db } from '@/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, getDocs, query } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 import { FiEdit } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 const History = () => {
+
+
+    const [conversations, setConversations] = useState([]);
+    const [messages, setMessages] = useState([]);
+    const [selectedConversationId, setSelectedConversationId] = useState(null);
+
+    const fetchConversations = async (userId) => {
+        // Create a query to fetch conversations
+        const q = query(collection(db, "users", userId, "conversations"));
+
+        // Execute the query and get a snapshot
+        const querySnapshot = await getDocs(q);
+
+        // Map through the snapshot to extract data
+        const fetchedConversations = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            messages: doc.data().messages || [],
+            promptName: doc.data().promptName || doc.id, // Use the doc.id if promptName is missing
+            createdAt: doc.data().createdAt, // assuming this exists
+
+        })).sort((a, b) => {
+            // Sort by createdAt if it exists
+            return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+        });
+
+        // Update state with fetched conversations
+        setConversations(fetchedConversations);
+    };
+
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchConversations(user.uid); // pass uid directly
+            }
+        });
+
+        return () => unsubscribe(); // cleanup listener
+    }, []);
+    const openConversation = (conversationId) => {
+        const conversation = conversations.find((conv) => conv.id === conversationId);
+        if (conversation) {
+            setMessages(conversation.messages);
+            setSelectedConversationId(conversationId);
+        }
+    };
+
     return (
         <div className="bg-gray-950 w-dvw h-screen overflow-y-auto text-white text-2xl flex flex-col   ">
             {/* Header */}
@@ -26,6 +76,17 @@ const History = () => {
                 </div>
             </div>
             <h1 className='text-white text-4xl m-5'>History</h1>
+            {conversations.map((conv) => (
+                <button
+                    key={conv.id}
+                    onClick={() => openConversation(conv.id)}
+                    className="p-4 m-2 bg-gray-800 rounded hover:bg-gray-700 text-left w-auto"
+                >
+                    <div className="font-bold">{conv.promptName}</div>
+                    <div className="text-sm text-gray-400">{conv.messages.length} messages</div>
+                </button>
+            ))}
+
         </div>
     );
 }

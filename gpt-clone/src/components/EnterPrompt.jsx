@@ -3,16 +3,17 @@ import arrow from "../assets/arrow_upward.png";
 const EnterPrompt = ({ handleSend, input, setInput, setPressEnter }) => {
     const handleKeyDown = (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
-            setPressEnter(true)
-            e.preventDefault(); // Prevents new line in textarea
-            handleSend(e); // Trigger submit
+
+            e.preventDefault(); // 
+            handleSend(e); // 
+            setPressEnter(true); // 
         }
     };
     return (
 
 
         <form
-            onSubmit={handleSend}
+        
             className="w-7xl flex flex-col items-center"
         >
             <div className="flex p-4 h-3xl  bg-gray-900 rounded-4xl  w-5xl justify-between  ">

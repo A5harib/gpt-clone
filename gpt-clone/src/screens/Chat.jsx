@@ -6,8 +6,10 @@ import { Link } from "react-router-dom";
 import ChatMessage from "@/components/ChatMessage";
 import { motion } from "framer-motion";
 import { db } from "../firebase"; // Ensure your firebase config exports 'db'
-import { collection, addDoc, doc, updateDoc, getDocs, query, where, setDoc, orderBy, Timestamp } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, getDocs, query, where, setDoc, orderBy, Timestamp, QuerySnapshot, serverTimestamp } from "firebase/firestore";
 import { auth } from "../firebase"; // If using Firebase Auth
+import ReactMarkdown from "react-markdown";
+
 
 
 const Chat = () => {
@@ -16,91 +18,92 @@ const Chat = () => {
   const chatContainerRef = useRef(null);
   const [promptName, setPromptName] = useState(null);
   const [pressEnter, setPressEnter] = useState(false);
-
-
-
-
-
-  const [conversations, setConversations] = useState([]);
   const [selectedConversationId, setSelectedConversationId] = useState(null);
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [messages]); // Runs every time messages change
-  const getGeminiResponse = async (userMessage) => {
+  const getGeminiResponse = async (conversationHistory = [], userMessage = "") => {
     const API_KEY = "AIzaSyCHA9-xhPVN9EkuOwV2li-Z8wLEC96DkVc";
     const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+
+    const structuredHistory = conversationHistory.map((msg) => ({
+      role: msg.type === "user" ? "user" : "model",
+      parts: [{ text: msg.text }]
+    }));
+
+    // Append current user message to keep the flow
+    structuredHistory.push({
+      role: "user",
+      parts: [{ text: userMessage }]
+    });
 
     const response = await fetch(URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: userMessage }] }],
-      }),
+      body: JSON.stringify({ contents: structuredHistory })
     });
 
     const data = await response.json();
     return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
   };
+
   const handleSend = async (e) => {
-    setPressEnter(true)
-    if (input.length <= 5)
-      setPromptName(await getGeminiResponse(`Summarize in 5 words: ${input}`))
     e.preventDefault();
+    setPressEnter(true);
     if (!input.trim()) return;
 
-    const userId = auth.currentUser?.uid; // Get the logged-in user's ID
+    const userId = auth.currentUser?.uid;
     if (!userId) return alert("User not logged in");
 
-    const conversationId = selectedConversationId || (promptName ? promptName.trim() : '') || input.trim(); // Use existing conversation or create a new one
+    let now = new Date();
+    let formattedTime = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+
+    const sanitize = (str) => str.replace(/[^a-zA-Z0-9-_ ]/g, ' ').slice(0, 50);
+
+    let conversationId;
+
+
+    let summary = promptName;
+    if (!selectedConversationId) {
+
+      if (!summary && input.length >= 5) {
+        summary = await getGeminiResponse(messages || [], `Summarize in 5 words: ${input}`);
+        setPromptName(summary);
+      }
+      summary = summary || input;
+      conversationId = sanitize((summary || input).trim());
+      setSelectedConversationId(conversationId);
+    } else {
+      conversationId = selectedConversationId;
+    }
+
     const conversationRef = doc(db, "users", userId, "conversations", conversationId);
 
+    const userMessage = { type: "user", text: input, timestamp: formattedTime };
+    const updatedHistory = [...messages, userMessage];
 
-
-    const newMessage = { type: "user", text: input, Timestamp: Date.now() };
-    setMessages((prev) => [...prev, newMessage, { type: "ai", text: "Thinking..." }]);
+    setMessages([...updatedHistory, { type: "ai", text: "Thinking..." }]);
     setInput("");
 
-    await setDoc(conversationRef, { messages: [...messages, newMessage] }, { merge: true });
+    await setDoc(conversationRef, {
+      messages: updatedHistory,
+      promptName: promptName,
+      createdAt: serverTimestamp(),
+    }, { merge: true });
 
-    const result = await getGeminiResponse(input); // Call the API
+    const aiResponse = await getGeminiResponse(updatedHistory, input);
 
-    const updatedMessages = [...messages, newMessage, { type: "ai", text: result, timestamp: Date.now() }];
-    await updateDoc(conversationRef, { messages: updatedMessages });
+    const finalMessages = [...updatedHistory, { type: "ai", text: aiResponse, timestamp: formattedTime }];
+    await updateDoc(conversationRef, {
+      messages: finalMessages,
+      createdAt: serverTimestamp(),
+    });
 
-    // setMessages((prev) =>
-    //   prev.map((msg, index) =>
-    //     index === prev.length - 1 ? { ...msg, text: result } : msg
-    //   )
-    // );
-    setMessages(updatedMessages);
+    setMessages(finalMessages);
   };
-  const fetchConversations = async () => {
-    const userId = auth.currentUser?.uid;
-    if (!userId) return;
 
-    const q = query(collection(db, "users", userId, "conversations"));
-    const querySnapshot = await getDocs(q);
-
-    const fetchedConversations = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      messages: doc.data().messages || [],
-    }));
-
-    setConversations(fetchedConversations);
-  };
-  useEffect(() => {
-    fetchConversations();
-
-  }, []);
-  const openConversation = (conversationId) => {
-    const conversation = conversations.find((conv) => conv.id === conversationId);
-    if (conversation) {
-      setMessages(conversation.messages);
-      setSelectedConversationId(conversationId);
-    }
-  };
 
 
   return (
@@ -109,16 +112,13 @@ const Chat = () => {
 
       <div className="flex justify-between p-3 border-b border-gray-800 sticky top-0 bg-gray-950   items-center">
         <div className="flex gap-4 items-center">
-          <div className="font-bold text-[#B4B4B4] text-3xl">ChatGPT</div>
+          <Link to="/">
+            <div className="font-bold text-[#B4B4B4] text-3xl">ChatGPT</div>
+          </Link>
           <FiEdit className="text-[#B4B4B4] font-bold text-2xl mt-1" />
         </div>
-        <div >
 
-          {promptName ? (
-            <div className="text-white text-xl flex items-center justify-center "> {promptName}</div>
-          ) : null}
-
-        </div>
+        <div className="text-white text-xl flex items-center justify-center "><ReactMarkdown>{promptName}</ReactMarkdown> </div>
 
         <div className="flex gap-4">
           <Link to="/chat/history">
@@ -134,13 +134,13 @@ const Chat = () => {
         </div>
       </div>
       {/* Chat Body */}
-      {messages.length === 0 || !{ pressEnter } ? (
+      {messages.length === 0 || !pressEnter ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
           transition={{ duration: 0.3 }}
-          className="flex flex-col justify-center items-center gap-2 mt-10 mb-96"
+          className="flex flex-col justify-center items-center gap-2 h-screen  "
         >
           <div className="font-bold text-4xl mb-10">What can I help with?</div>
           <EnterPrompt handleSend={handleSend} input={input} setInput={setInput} setPressEnter={setPressEnter} />

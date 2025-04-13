@@ -113,9 +113,13 @@ const Chat = () => {
       <div className="flex justify-between p-3 border-b border-gray-800 sticky top-0 bg-gray-950   items-center">
         <div className="flex gap-4 items-center">
           <Link to="/">
-            <div className="font-bold text-[#B4B4B4] text-3xl">ChatGPT</div>
+            <div className="font-bold text-white text-3xl">CharmAI</div>
           </Link>
-          <FiEdit className="text-[#B4B4B4] font-bold text-2xl mt-1" />
+          <Link to="/chat">
+
+            <FiEdit className="text-white font-bold text-2xl mt-1" />
+          </Link>
+
         </div>
 
         <div className="text-white text-xl flex items-center justify-center "><ReactMarkdown>{promptName}</ReactMarkdown> </div>
